@@ -19,9 +19,8 @@ if gpus:
 
 if __name__ == "__main__":
 
-    model_name = "1_model"
+    model_name = "best_model"
     save_model_path = "model/" + str(model_name) + ".keras"
-
     batch_size = 1
     img_size=(1086, 2046)
     epochs = 300

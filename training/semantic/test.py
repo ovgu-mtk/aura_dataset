@@ -1,7 +1,8 @@
 import tensorflow as tf
-from dataloader import DataLoader
-from tensorflow_model import compile_model, FastSCNN, create_unet_model, create_small_unet_pretrained, DeepLabV3Plus, \
-        load_pretrained_hrnet, simple_unet
+from aura_dataset.training.semantic.dataloader import DataLoader
+from aura_dataset.training.semantic.tensorflow_model import (
+    compile_model, FastSCNN, create_unet_model, create_small_unet_pretrained, DeepLabV3Plus, \
+        load_pretrained_hrnet, simple_unet)
 from aura_dataset.training.semantic.utils.metrics import MeanIoU
 from aura_dataset.training.semantic.utils.losses import combined_loss, dice_loss, ohem_loss
 
