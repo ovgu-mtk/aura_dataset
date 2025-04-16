@@ -35,8 +35,8 @@ It reflects the unique perspective and challenges of micromobility in diverse en
 │
 ├── utils
 │   ├── bb_viewer.py        # Draw bounding boxes on images 
-│   └── semantic_viewer.py
-│   └── classes.py 
+│   └── semantic_viewer.py  # Visualize semantic segmentation 
+│   └── classes.py          # Class descriptions for bb/semantic
 
 ```
 
