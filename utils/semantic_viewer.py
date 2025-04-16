@@ -5,19 +5,16 @@ from PIL import Image
 import classes as cls
 
 
-
-
-
 # Paths to dataset
-path_dataset_rgb = "../dataset/semantic/train_validate/images/"
-path_dataset_gray = "../dataset/semantic/train_validate/annotations/"
+images_path = "../dataset/semantic/train_validate/images/"
+annotations_path = "../dataset/semantic/train_validate/annotations/"
 
 # Process images
-for image_name in os.listdir(path_dataset_rgb):
+for image_name in os.listdir(images_path):
     if image_name.endswith(".png"):
         # Load RGB and grayscale images using PIL
-        img = Image.open(os.path.join(path_dataset_rgb, image_name)).convert("RGB")
-        gray = Image.open(os.path.join(path_dataset_gray, image_name)).convert("L")
+        img = Image.open(os.path.join(images_path, image_name)).convert("RGB")
+        gray = Image.open(os.path.join(annotations_path, image_name)).convert("L")
 
         # Resize images
         img = img.resize((682, 362), Image.BILINEAR)

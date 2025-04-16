@@ -16,6 +16,7 @@ class_descriptions_bb = [
     {"id": 37, "name": "police vehicle", "color": [127, 170, 255]},
     {"id": 38, "name": "fire truck", "color": [85, 114, 172]},
     {"id": 39, "name": "traffic light", "color": [0, 170, 255]},
+    {"id": 40, "name": "traffic light cyclist/pedestrian", "color": [0, 180, 255]},
     {"id": 42, "name": "adult without baby buggy or mobility support", "color": [0, 255, 0]},
     {"id": 43, "name": "child without baby buggy or mobility support", "color": [0, 212, 0]},
     {"id": 44, "name": "person with baby buggy", "color": [0, 170, 0]},

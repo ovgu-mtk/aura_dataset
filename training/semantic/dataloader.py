@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import aura_dataset.utils.classes as cls
 
-image_path = "../../dataset/semantic/train_validate/images"
+images_path = "../../dataset/semantic/train_validate/images"
 annotations_path = "../../dataset/semantic/train_validate/annotations"
 
 # map colors to merge classes
@@ -22,7 +22,7 @@ merge_map = {
 
 class DataLoader(Sequence):
     def __init__(self,
-                 image_path=image_path,
+                 images_path=images_path,
                  annotations_path=annotations_path,
                  batch_size=4,
                  img_size=(512, 1024),
@@ -32,7 +32,7 @@ class DataLoader(Sequence):
                  num_classes=26,
                  merge_classes=False):
 
-        self.image_path = image_path
+        self.images_path = images_path
         self.annotations_path = annotations_path
         self.batch_size = batch_size
         self.img_size = img_size
@@ -41,7 +41,7 @@ class DataLoader(Sequence):
         self.num_classes = num_classes
         self.merge_classes = merge_classes
 
-        self.image_filenames = sorted(os.listdir(image_path))
+        self.image_filenames = sorted(os.listdir(images_path))
         self.mask_filenames = sorted(os.listdir(annotations_path))
 
         assert len(self.image_filenames) == len(
@@ -82,7 +82,7 @@ class DataLoader(Sequence):
         masks = []
 
         for img_filename, mask_filename in zip(batch_image_filenames, batch_mask_filenames):
-            img_path = os.path.join(self.image_path, img_filename)
+            img_path = os.path.join(self.images_path, img_filename)
             mask_path = os.path.join(self.annotations_path, mask_filename)
 
             img = load_img(img_path, target_size=self.img_size, color_mode='rgb')
@@ -101,9 +101,9 @@ class DataLoader(Sequence):
 
         return np.array(images), np.array(masks)
 
-    def visualize_results(self, model, image_path, annotations_path, img_size=(512, 1024)):
-        for input_image, ground_truth in zip(os.listdir(image_path), os.listdir(annotations_path)):
-            img = load_img(os.path.join(image_path, input_image), target_size=img_size)
+    def visualize_results(self, model, images_path, annotations_path, img_size=(512, 1024)):
+        for input_image, ground_truth in zip(os.listdir(images_path), os.listdir(annotations_path)):
+            img = load_img(os.path.join(images_path, input_image), target_size=img_size)
             img_array = img_to_array(img) / 255.0
             img_input = np.expand_dims(img_array, axis=0)
 

@@ -13,7 +13,7 @@ def infer(model, X_input):
 
 # Example usage
 if __name__ == "__main__":
-    image_path = "../../dataset/semantic/test/images"
+    images_path = "../../dataset/semantic/test/images"
     annotations_path = "../../dataset/semantic/test/annotations"
     batch_size = 1
     #img_size=(512, 1024)
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     model.summary()
 
 
-    test_loader = DataLoader(image_path=image_path,
+    test_loader = DataLoader(images_path=images_path,
                              annotations_path=annotations_path,
                              batch_size=1,
                              img_size=img_size,
@@ -50,6 +50,6 @@ if __name__ == "__main__":
     print("Test mIoU:", results[2])
 
 
-    test_loader.visualize_results(model, image_path, annotations_path, img_size=img_size)
+    test_loader.visualize_results(model, images_path, annotations_path, img_size=img_size)
 
 
