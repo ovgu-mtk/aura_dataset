@@ -4,8 +4,8 @@ import xml.etree.ElementTree as ET
 import classes as cls
 
 # Paths to dataset
-images_path = "../dataset/bb/train_validate/side/images/"
-annotations_path = "../dataset/bb/train_validate/side/annotations/"
+images_path = "../dataset/bb/train_validate/front/images/"
+annotations_path = "../dataset/bb/train_validate/front/annotations/"
 
 # Function to get color and name for the given class id
 def get_class_info(class_id, class_descriptions):
@@ -15,7 +15,7 @@ def get_class_info(class_id, class_descriptions):
     return None, None
 
 # Get list of image and annotation files
-image_files = [f for f in os.listdir(images_path) if f.endswith('.png')]
+image_files = [f for f in os.listdir(images_path) if f.endswith('.jpg')]
 annotation_files = [f for f in os.listdir(annotations_path) if f.endswith('.xml')]
 
 # Sort files to ensure matching pairs

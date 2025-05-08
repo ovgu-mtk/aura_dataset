@@ -1,16 +1,12 @@
 import tensorflow as tf
-from aura_dataset.training.semantic.dataloader import DataLoader
-from aura_dataset.training.semantic.tensorflow_model import (
+from training.semantic.dataloader import SemanticDataLoader
+from training.semantic.tensorflow_model import (
     compile_model, FastSCNN, create_unet_model, create_small_unet_pretrained, DeepLabV3Plus, \
         load_pretrained_hrnet, simple_unet)
-from aura_dataset.training.semantic.utils.metrics import MeanIoU
-from aura_dataset.training.semantic.utils.losses import combined_loss, dice_loss, ohem_loss
+from training.semantic.utils.metrics import MeanIoU
+from training.semantic.utils.losses import combined_loss, dice_loss, ohem_loss
 
 
-# fasten inference speed
-@tf.function
-def infer(model, X_input):
-    return model(X_input, training=False)
 
 # Example usage
 if __name__ == "__main__":
@@ -35,14 +31,8 @@ if __name__ == "__main__":
     compile_model(model)
     model.summary()
 
-
-    test_loader = DataLoader(images_path=images_path,
-                             annotations_path=annotations_path,
-                             batch_size=1,
-                             img_size=img_size,
-                             split='test',
-                             merge_classes=True,
-                             shuffle=False)
+    test_loader = SemanticDataLoader(images_path=images_path, annotations_path=annotations_path, batch_size=1,
+                             img_size=img_size, split='test', merge_classes=True, shuffle=False)
 
 
     results = model.evaluate(test_loader)

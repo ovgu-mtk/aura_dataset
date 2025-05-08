@@ -4,7 +4,8 @@ import tensorflow as tf
 def ohem_loss(y_true, y_pred, k=0.7):
     # Convert ground truth to one-hot encoding
     y_true = tf.cast(y_true, tf.int32)
-    y_true = tf.one_hot(tf.squeeze(y_true, axis=-1), depth=26)
+    num_classes = tf.shape(y_pred)[-1]
+    y_true = tf.one_hot(tf.squeeze(y_true, axis=-1), depth=num_classes)
 
     # Calculate per-pixel cross entropy loss
     pixel_losses = tf.keras.losses.categorical_crossentropy(y_true, y_pred)

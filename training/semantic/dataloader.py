@@ -4,45 +4,77 @@ from tensorflow.keras.utils import Sequence
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
-import aura_dataset.utils.classes as cls
+from pathlib import Path
+import utils.classes as cls
 
-images_path = "../../dataset/semantic/train_validate/images"
-annotations_path = "../../dataset/semantic/train_validate/annotations"
+def find_root(start_path, target_name):
+    current_path = Path(start_path).resolve()
 
-# map colors to merge classes
-merge_map = {
-            3: 2,   #  shared bicycle-/pedestrian path -> bicycle lane
-            8: 4,   # parking_space -> car_lane
-            11: 12, # centre line -> lane boundary
-            16: 15,  # cyclist without bicycle -> cyclist with bicycle
-            17: 15,  # motorcyclist with motorcycle -> cyclist with bicycle
-            18: 15,  # motorcyclist without motorcycle -> cyclist with bicycle
-        }
+    # Traverse up the directory tree
+    for parent in current_path.parents:
+        if parent.name == target_name:
+            return parent
+
+    return None  # Return None if no match is found
+
+# paths
+base_dataset_path = str(find_root(__file__ , "aura_dataset")) + "/dataset/semantic/train_validate/"
 
 
-class DataLoader(Sequence):
-    def __init__(self,
-                 images_path=images_path,
-                 annotations_path=annotations_path,
+# Define merge groups: new_id -> [old_ids...]
+merge_groups = {
+    1: [2],                    # pedestrian path
+    2: [3, 7],                 # car lane
+    3: [4],                    # sealed free space
+    4: [5],                    # unsealed path
+    5: [6],                    # horizontal vegetation
+    6: [8],                    # railway track
+    7: [9],                    # curb stone
+    8: [10,11],                # lane stripes
+    9: [12],                   # vertical barrier
+    10: [13],                  # vehicle
+    11: [14,15,16,17],         # cyclist
+    12: [18],                  # pedestrian
+    13: [19],                  # traffic sign
+    14: [20],                  # traffic light
+    15: [21],                  # vertical vegetation
+    16: [22],                  # sky
+    17: [23],                  # miscellanous static object
+    18: [24],                  # miscellanous dynamic object
+}
+
+# Flatten to a merge_map
+merge_map = {old_id: new_id for new_id, old_ids in merge_groups.items() for old_id in old_ids}
+
+
+class SemanticDataLoader(Sequence):
+    def __init__(self, base_path=base_dataset_path,
                  batch_size=4,
-                 img_size=(512, 1024),
+                 img_size=(1086, 2046),
                  shuffle=True,
                  split='train',
                  val_split=0.1,
-                 num_classes=26,
-                 merge_classes=False):
+                 merge_classes=True,
+                 class_descriptions=cls.class_descriptions_semantic):
 
-        self.images_path = images_path
-        self.annotations_path = annotations_path
+        self.images_path = base_path + "images"
+        self.annotations_path = base_path + "annotations"
         self.batch_size = batch_size
         self.img_size = img_size
         self.shuffle = shuffle
         self.split = split
-        self.num_classes = num_classes
         self.merge_classes = merge_classes
 
-        self.image_filenames = sorted(os.listdir(images_path))
-        self.mask_filenames = sorted(os.listdir(annotations_path))
+        if self.merge_classes:
+            self.number_of_classes = self.count_merged_classes(class_descriptions, merge_groups)
+        else:
+            self.number_of_classes = len(class_descriptions)
+
+        # Set up class descriptions if provided, otherwise use an empty list
+        self.class_descriptions = class_descriptions if class_descriptions else []
+
+        self.image_filenames = sorted(os.listdir(self.images_path))
+        self.mask_filenames = sorted(os.listdir(self.annotations_path))
 
         assert len(self.image_filenames) == len(
             self.mask_filenames), "Number of input images and masks must be the same"
@@ -76,6 +108,22 @@ class DataLoader(Sequence):
     def on_epoch_end(self):
         if self.shuffle:
             np.random.shuffle(self.indices)
+
+    def count_merged_classes(self, original_classes, merge_groups):
+        merged_ids = set()  # all old_ids that are being merged
+        for old_ids in merge_groups.values():
+            merged_ids.update(old_ids)
+
+        destination_ids = set(merge_groups.keys())  # new class IDs
+
+        untouched_ids = [
+            class_id for class_id in original_classes.keys()
+            if class_id not in merged_ids and class_id not in destination_ids
+        ]
+
+        total_classes = len(destination_ids) + len(untouched_ids)
+        return total_classes
+
 
     def __data_generation(self, batch_image_filenames, batch_mask_filenames):
         images = []
@@ -144,25 +192,26 @@ if __name__ == "__main__":
     batch_size = 1
     img_size = (1024, 2048)
 
-    train_gen = DataLoader(batch_size=batch_size,
+    train_gen = SemanticDataLoader(batch_size=batch_size,
                  img_size=img_size,
                  shuffle=False,
                  split='train',
                  val_split=0.1,
-                 num_classes=26,
                  merge_classes=True)
 
-    val_gen = DataLoader(batch_size=batch_size,
+    val_gen = SemanticDataLoader(batch_size=batch_size,
                  img_size=img_size,
                  shuffle=False,
                  split='val',
                  val_split=0.1,
-                 num_classes=26,
-                 merge_classes=True)
+                 merge_classes=False)
 
 
     print(len(train_gen))
     print(len(val_gen))
+    print(train_gen.number_of_classes)
+    print(val_gen.number_of_classes)
+
 
     for i in range(20):
         # use first batch of training data for plot
