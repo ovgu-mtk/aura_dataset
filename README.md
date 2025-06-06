@@ -2,9 +2,12 @@
 
 **A vision dataset for semantic segmentation and object detection recorded from a bike's perspective.**
 
-This repository provides sample data and code for working with a custom dataset focused on urban mobility and perception tasks from the viewpoint of a bicycle. It includes data for **semantic segmentation** and **bounding box detection**, a TensorFlow-based training pipeline, and utilities for visualization.
+This repository provides sample data and code for working with a custom dataset focused on urban mobility 
+and perception tasks from the viewpoint of a bicycle. It includes data for **semantic segmentation** and 
+**bounding box detection**, a TensorFlow-based training pipeline, and utilities for visualization.
 
-> 📧 **Note**: Only sample data is included here. To request access to the full dataset for academic or research purposes, please contact:  
+> 📧 **Note**: Only sample data is included here. To request access to the full dataset for 
+> academic or research purposes, please contact:  
 > [stefan.sass@ovgu.de](mailto:stefan.sass@ovgu.de)  
 > [markus.hoefer@ovgu.de](mailto:markus.hoefer@ovgu.de)
 
@@ -12,7 +15,8 @@ This repository provides sample data and code for working with a custom dataset 
 
 ## 📸 Sensor Setup
 
-The dataset was recorded from a mobile sensor platform mounted on a cargo bike, capturing urban, park, and pedestrian areas.
+The dataset was recorded from a mobile sensor platform mounted on a cargo bike, 
+capturing urban, park, and pedestrian areas.
 It reflects the unique perspective and challenges of micromobility in diverse environments.
 
 ![sensor_platform.jpg](doc/aura_bike.jpg)
@@ -82,12 +86,34 @@ You can find them under:
 
 ### Bounding Boxes:
 
+- YOLOv8 Models with backbones:
+  - YOLOv8-XS
+  - YOLOv8-L
+
+**Table: COCO-style evaluation metrics for YOLOv8-XS and YOLOv8-L**
+
+| **Metric**                | **YOLOv8-XS [%]** | **YOLOv8-L [%]** |
+|--------------------------|------------------|------------------|
+| mAP@[0.5:0.95]           | 14.4             | 17.2             |
+| mAP@0.5                  | 20.2             | 23.2             |
+| mAP@0.75                 | 16.8             | 20.1             |
+| mAP (Small objects)      | 3.1              | 10.4             |
+| mAP (Medium objects)     | 16.7             | 19.7             |
+| mAP (Large objects)      | 18.0             | 23.3             |
+| Recall@1                 | 11.7             | 13.4             |
+| Recall@10                | 16.8             | 20.1             |
+| Recall@100               | 16.8             | 20.2             |
+| Recall (Small objects)   | 3.9              | 11.2             |
+| Recall (Medium objects)  | 18.7             | 21.6             |
+| Recall (Large objects)   | 21.1             | 27.0             |
 
 
+![semantic_results.png](doc/bb_results.png)
+Qualitative comparison of object detection results. From left to right: 
+Original image with ground truth annotations, YOLOv8-XS prediction, YOLOv8-L prediction.
 
 
 ### Semantic:
-
 
 
 | **Class Granularity**                 | **mPA [%]** | **mIoU [%]** |
@@ -97,9 +123,9 @@ You can find them under:
 | 13 classes (strongly merged)         | 76.7        | 67.2         |
 
 
-
 ![semantic_results.png](doc/semantic_results.png)
-Qualitative comparison of semantic segmentation results. Each column shows one example. The first row contains the original input images. The second row shows the ground truth annotations. 
+Qualitative comparison of semantic segmentation results. Each column shows one example. 
+The first row contains the original input images. The second row shows the ground truth annotations. 
 Rows three to five show the predictions from models trained with 13, 19, and all 25 classes, respectively. 
 
 

@@ -55,7 +55,8 @@ class BoundingBoxDatasetLoader:
                  augmentation_copies=2,
                  augmentation_scale_factor=(0.8, 1.25),
                  merge_classes=True,
-                 class_descriptions=cls.class_descriptions_bb):
+                 class_descriptions=cls.class_descriptions_bb,
+                 shuffle=False):
 
         self.dataset_base = dataset_dir
         self.batch_size = batch_size
@@ -66,6 +67,7 @@ class BoundingBoxDatasetLoader:
         self.augmentation_copies = augmentation_copies
         self.augmentation_scale_factor = augmentation_scale_factor
         self.merge_classes = merge_classes
+        self.shuffle = shuffle
 
         # Set up class descriptions if provided, otherwise use an empty list
         self.class_descriptions = class_descriptions if class_descriptions else []
@@ -248,7 +250,8 @@ class BoundingBoxDatasetLoader:
         data = tf.data.Dataset.from_tensor_slices((image_paths, classes, bbox))
 
         # Shuffle dataset
-        data = data.shuffle(buffer_size=len(image_paths), reshuffle_each_iteration=False)
+        if self.shuffle:
+            data = data.shuffle(buffer_size=len(image_paths), reshuffle_each_iteration=False)
 
         if self.split == 'test':
             self.val_data = data.take(int(len(image_paths)))

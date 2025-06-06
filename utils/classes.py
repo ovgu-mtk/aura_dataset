@@ -1,5 +1,3 @@
-
-
 # Class descriptions for bounding boxes
 class_descriptions_bb = [
     {"id": 26, "name": "speed bump", "color": [0, 97, 97], "pos": 0},
@@ -97,5 +95,3 @@ class_descriptions_semantic = {
     24: (255, 240, 250),  # miscellanous static object
     25: (226, 227, 255)  # miscellanous dynamic object
 }
-
-

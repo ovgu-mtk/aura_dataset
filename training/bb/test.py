@@ -21,7 +21,7 @@ def parse_args():
     parser.add_argument('--batch_size', type=int, default=1, help='Batch size. Default: 1')
     parser.add_argument('--split', type=str, default='test', choices=['train', 'val', 'test'],
                         help='Dataset split to evaluate on. Default: test')
-    parser.add_argument('--visualization_samples', type=int, default=5,
+    parser.add_argument('--visualization_samples', type=int, default=50,
                         help='Number of samples to visualize. Default: 5')
     parser.add_argument('--score_threshold', type=float, default=0.5,
                         help='Confidence score threshold for detections. Default: 0.1')
@@ -45,13 +45,7 @@ def set_gpu(gpu_index):
             tf.config.experimental.set_memory_growth(gpus[0], True)
 
 
-# fasten inference speed
-@tf.function
-def infer(model, X_input):
-    return model(X_input, training=False)
-
-
-def visualize_predictions(model, dataset, class_mapping, num_samples=5, score_threshold=0.5):
+def visualize_predictions(model, dataset, class_mapping, num_samples=50, score_threshold=0.5):
     """Visualize model predictions on a few samples from the dataset with GT and predictions side by side."""
     for i, batch in enumerate(dataset.take(num_samples)):
         if i >= num_samples:
@@ -60,15 +54,11 @@ def visualize_predictions(model, dataset, class_mapping, num_samples=5, score_th
         images, y_true = batch
 
         # Make predictions
-        # if use infer function no "confidence" value in model output -> no filtering via score_threshold
-        # y_pred = infer(model,images)
         y_pred = model.predict(images, verbose=0)
 
         # Convert predictions to the expected format for visualization
         # Filter by confidence score
         for j in range(len(images)):
-
-            # Filter predictions by confidence score
             filtered_boxes = []
             filtered_classes = []
             filtered_scores = []
@@ -84,7 +74,6 @@ def visualize_predictions(model, dataset, class_mapping, num_samples=5, score_th
                     score = y_pred["confidence"][j][box_idx]
                     filtered_scores.append(score)
 
-            print(f"Sample {i + 1}, Image {j + 1}: Predicted objects: {object_counter} / GT objects: {gt_objects}")
             if object_counter > 0:
                 for k, score in enumerate(filtered_scores):
                     print(f"  Predicted object {k + 1} with confidence: {score:.3f}")
@@ -157,7 +146,6 @@ def visualize_predictions(model, dataset, class_mapping, num_samples=5, score_th
 
 def evaluate_coco_metrics_(model, dataset, score_threshold=0.5, max_samples=None):
     """Evaluate model using COCO metrics with confidence threshold and progress display."""
-
     # Generate predictions
     coco_predictions = []
     gt_annotations = []
@@ -297,16 +285,18 @@ if __name__ == "__main__":
         print(f"  {arg}: {value}")
 
     # Get model
-    model_name = "yolo_v8_xs_12_classes_2"
+    #model_name = "yolo_v8_xs_12_classes"
+    model_name = "yolo_v8_l_12_classes"
     #model_name = "yolo_v8_xl_12_classes"
 
 
     if model_name == "yolo_v8_xs_12_classes":
         model_backbone = "yolo_v8_xs_backbone_coco"
+    elif model_name == "yolo_v8_l_12_classes":
+        model_backbone = "yolo_v8_l_backbone_coco"
     elif model_name == "yolo_v8_xl_12_classes":
         model_backbone = "yolo_v8_xl_backbone_coco"
-    elif model_name == "yolo_v8_ö_12_classes":
-        model_backbone = "yolo_v8_l_backbone_coco"
+
     else:
         raise ValueError("not a valid model_name")
 
@@ -323,10 +313,10 @@ if __name__ == "__main__":
     class_mapping = test_loader.class_mapping_merged
 
     # Visualize some predictions
-    #print(f"Visualizing {args.visualization_samples} samples...")
-    #visualize_predictions(model, test_ds, class_mapping,
-    #                      num_samples=args.visualization_samples,
-    #                      score_threshold=args.score_threshold)
+    print(f"Visualizing {args.visualization_samples} samples...")
+    visualize_predictions(model, test_ds, class_mapping,
+                          num_samples=args.visualization_samples,
+                          score_threshold=args.score_threshold)
 
     # Evaluate COCO metrics
     print("\nEvaluating COCO metrics (this may take a while)...")
