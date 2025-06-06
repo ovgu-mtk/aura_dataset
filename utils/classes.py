@@ -70,31 +70,32 @@ class_descriptions_bb = [
 
 # Class descriptions for semantic segmentation
 class_descriptions_semantic = {
-    0: (255, 103, 15),      # bicycle lane
-    1: (255, 170, 0),       # pedestrian path
-    2: (0, 170, 127),       # shared bicycle-/pedestrian path
-    3: (170, 170, 0),       # car lane
-    4: (156, 170, 168),     # sealed free space
-    5: (112, 112, 112),     # unsealed path
-    6: (85, 255, 127),      # horizontal vegetation
-    7: (255, 170, 255),     # parking space
-    8: (255, 85, 127),      # railway track
-    9: (152, 101, 0),       # curb stone
-    10: (170, 0, 255),      # centre line
-    11: (239, 239, 0),      # lane boundary
-    12: (170, 0, 0),        # vertical barrier
-    13: (0, 0, 255),        # vehicle
-    14: (255, 0, 0),        # cyclist with bicycle
-    15: (191, 0, 0),        # bicycle without cyclist
-    16: (75, 207, 255),     # motorcyclist with motorcycle
-    17: (56, 168, 168),     # motorcycle without motorcyclist
-    18: (255, 255, 0),      # pedestrian
-    19: (170, 170, 255),    # traffic sign
-    20: (85, 85, 0),        # traffic light
-    21: (0, 170, 0),        # vertical vegetation
-    22: (170, 255, 255),    # sky
-    23: (255, 240, 250),    # miscellanous static object
-    24: (226, 227, 255)     # miscellanous dynamic object
+    0: (225, 125, 125),  # ego-vehicle
+    1: (255, 103, 15),  # bicycle lane
+    2: (255, 170, 0),  # pedestrian path
+    3: (0, 170, 127),  # shared bicycle-/pedestrian path
+    4: (170, 170, 0),  # car lane
+    5: (156, 170, 168),  # sealed free space
+    6: (112, 112, 112),  # unsealed path
+    7: (85, 255, 127),  # horizontal vegetation
+    8: (255, 170, 255),  # parking space
+    9: (255, 85, 127),  # railway track
+    10: (152, 101, 0),  # curb stone
+    11: (170, 0, 255),  # centre line
+    12: (239, 0, 239),  # lane boundary
+    13: (170, 0, 0),  # vertical barrier
+    14: (0, 0, 255),  # vehicle
+    15: (255, 0, 0),  # cyclist with bicycle
+    16: (191, 0, 0),  # bicycle without cyclist
+    17: (75, 207, 255),  # motorcyclist with motorcycle
+    18: (56, 168, 168),  # motorcycle without motorcyclist
+    19: (255, 255, 0),  # pedestrian
+    20: (170, 170, 255),  # traffic sign
+    21: (85, 85, 0),  # traffic light
+    22: (0, 170, 0),  # vertical vegetation
+    23: (170, 255, 255),  # sky
+    24: (255, 240, 250),  # miscellanous static object
+    25: (226, 227, 255)  # miscellanous dynamic object
 }
 
 

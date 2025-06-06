@@ -2,16 +2,16 @@ import os
 import argparse
 import tensorflow as tf
 from tensorflow import keras
-import keras_cv
 from training.bb.dataloader import BoundingBoxDatasetLoader
+from training.bb.model import create_yolo_model
 from utils.metrics import EvaluateCOCOMetricsCallback
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Train bounding box model.")
-    parser.add_argument('--gpu', type=int, choices=range(0, 4), default=0, help='GPU index to use (0-3). Default: 0')
-    parser.add_argument('--model_index', type=int, choices=range(0, 4), default=0,
+    parser.add_argument('--gpu', type=int, choices=range(0, 4), default=3, help='GPU index to use (0-3). Default: 0')
+    parser.add_argument('--model_index', type=int, choices=range(0, 4), default=3,
                         help='Model index to name the saved model. Default: 0')
-    parser.add_argument('--model_backbone', type=str, default='yolo_v8_s_backbone_coco',
+    parser.add_argument('--model_backbone', type=str, default='yolo_v8_xs_backbone_coco',
                         help='Model backbone. Options: yolo_v8_xs_backbone_coco, yolo_v8_s_backbone_coco, '
                              'yolo_v8_m_backbone_coco, yolo_v8_l_backbone_coco, yolo_v8_xl_backbone_coco. '
                              'Default: yolo_v8_s_backbone_coco')
@@ -44,8 +44,6 @@ def set_gpu(gpu_index):
             print(f"Failed to use GPU {gpu_index}, falling back to GPU 0. Error: {e}")
             tf.config.experimental.set_visible_devices(gpus[0], 'GPU')
             tf.config.experimental.set_memory_growth(gpus[0], True)
-
-
 
 
 
@@ -82,27 +80,14 @@ if __name__ == "__main__":
     train_loader.print_dataset_statistics()
     train_ds, val_ds = train_loader.get_datasets()
 
-    """
-    ## Create Model
-    """
+    # Create Model
+    model = create_yolo_model(dataloader=train_loader, backbone=args.model_backbone)
 
-    # Create YOLO detector with pre-trained backbone
-    model = keras_cv.models.YOLOV8Detector(num_classes=len(train_loader.class_mapping_merged), bounding_box_format="xyxy",
-        backbone=keras_cv.models.YOLOV8Backbone.from_preset(args.model_backbone ), fpn_depth=1)
-
-
-    # Create RetinaNet with ResNet50 backbone
-    #model = keras_cv.models.RetinaNet.from_preset("mobilenet_v3_small", num_classes=len(loader.class_mapping_merged),
-    #    bounding_box_format="xyxy"
-    #)
-
-    """
-    ## Compile Model
-    """
-
+    # Compile Model
     optimizer = tf.keras.optimizers.Adam(learning_rate=0.001, global_clipnorm=10.0)
     model.compile(optimizer=optimizer, classification_loss="binary_crossentropy", box_loss="ciou")
-    #model.compile(optimizer=optimizer, classification_loss="Focal", box_loss="SmoothL1")
+
+    # print model architecture
     #model.summary()
 
     # Print all arguments
@@ -111,12 +96,11 @@ if __name__ == "__main__":
     for arg, value in vars(args).items():
         print(f"  {arg}: {value}")
 
-
     """
     ## Training
     """
     # Add early stopping callback to prevent overfitting
-    early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
+    early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
 
     # Add learning rate scheduler to improve training
     reduce_plateau = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=3, min_lr=1e-6)

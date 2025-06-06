@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import cv2
 
 
 class MeanIoU(object):
@@ -32,3 +33,35 @@ class MeanIoU(object):
         iou[np.isnan(iou)] = 1
 
         return np.mean(iou).astype(np.float32)
+
+class MeanBJ(object):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.num_classes = num_classes
+
+    def mean_bj(self, y_true, y_pred):
+        return tf.numpy_function(self.mean_bj_numpy, [y_true, y_pred], tf.float32)
+
+    def mean_bj_numpy(self, y_true, y_pred):
+        target = np.argmax(y_true, axis=-1)
+        predicted = np.argmax(y_pred, axis=-1)
+
+        bj_scores = []
+
+        for cls in range(self.num_classes):
+            # Extract object boundaries
+            true_boundary = cv2.Canny((target == cls).astype(np.uint8) * 255, 100, 200)
+            pred_boundary = cv2.Canny((predicted == cls).astype(np.uint8) * 255, 100, 200)
+
+            # Ensure same shape for intersection calculation
+            pred_boundary = cv2.resize(pred_boundary, (true_boundary.shape[1], true_boundary.shape[0]),
+                                       interpolation=cv2.INTER_NEAREST)
+
+            # Compute intersection and union
+            intersection = np.logical_and(pred_boundary, true_boundary).sum()
+            union = np.logical_or(pred_boundary, true_boundary).sum()
+
+            if union > 0:
+                bj_scores.append(intersection / union)
+
+        return np.mean(bj_scores).astype(np.float32) if bj_scores else np.float32(0.0)  # Avoid empty arrays

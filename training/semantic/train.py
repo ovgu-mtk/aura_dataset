@@ -3,9 +3,7 @@ import argparse
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint
 from training.semantic.dataloader import SemanticDataLoader
-from training.semantic.tensorflow_model import (
-    compile_model, FastSCNN, create_unet_model, create_small_unet_pretrained,
-    DeepLabV3Plus, load_pretrained_hrnet, simple_unet, DeeplabV3Plus_2)
+from training.semantic.model import compile_model, load_pretrained_hrnet
 
 
 def parse_args():
@@ -18,8 +16,8 @@ def parse_args():
     parser.add_argument('--epochs', type=int, default=300, help='Number of training epochs. Default: 300')
     parser.add_argument('--batch_size', type=int, default=1, help='Batch size. Default: 1')
     parser.add_argument('--loss', type=str, default='ohem_loss', help='Loss function. Default: ohem_loss')
-    parser.add_argument('--merge_classes', type=str, choices=['true', 'false'], default='true',
-                        help='Activate/Deactivate merge classes. Default: true')
+    parser.add_argument('--num_classes', type=int, choices=[13,19,25], default=25,
+                        help='use all classes or a subdivision [13,19,25]. Default: 25')
     return parser.parse_args()
 
 
@@ -38,6 +36,7 @@ def set_gpu(gpu_index):
 
 
 if __name__ == "__main__":
+
     args = parse_args()
 
     # Set GPU
@@ -47,37 +46,23 @@ if __name__ == "__main__":
     model_name = f"{args.model_index}_model"
     save_model_path = f"model/{model_name}.keras"
 
-    # Load dataset
+    # Load datasets
     train_loader = SemanticDataLoader(batch_size=args.batch_size,
                                       img_size=(args.img_height, args.img_width),
                                       split='train',
-                                      merge_classes=args.merge_classes)
+                                      num_classes=args.num_classes)
 
     val_loader = SemanticDataLoader(batch_size=args.batch_size,
                                     img_size=(args.img_height, args.img_width),
                                     split='val',
-                                    merge_classes=args.merge_classes)
+                                    num_classes=args.num_classes)
 
-    """
-    ## Create Model
-    """
-
-    input_shape = (args.img_height, args.img_width, 3)
 
     # Load model
-    # model = FastSCNN(input_shape=input_shape, num_classes=train_loader.number_of_classes)
-    # model = create_unet_model(input_shape=input_shape, num_classes=train_loader.number_of_classes)
-    # model = DeepLabV3Plus(input_shape=input_shape, num_classes=train_loader.number_of_classes)
-    # model = simple_unet(input_shape=input_shape, num_classes=train_loader.number_of_classes)
-    # model = create_small_unet_pretrained(input_shape=(input_shape=input_shape, num_classes=train_loader.number_of_classes)
-    model = load_pretrained_hrnet(input_shape=input_shape, num_classes=train_loader.number_of_classes)
-    #model = DeeplabV3Plus_2(input_shape=input_shape, num_classes=train_loader.number_of_classes)
+    model = load_pretrained_hrnet(input_shape=(args.img_height, args.img_width, 3), num_classes=train_loader.number_of_classes)
 
 
-    """
-    ## Compile Model
-    """
-
+    # Compile Model
     compile_model(model, loss=args.loss)
     model.summary()
 
@@ -86,16 +71,10 @@ if __name__ == "__main__":
     for arg, value in vars(args).items():
         print(f"  {arg}: {value}")
 
-
-    """
-    ## Training
-    """
-
     # Callbacks
     checkpoint = ModelCheckpoint(save_model_path, save_best_only=True, monitor='val_loss', mode='min')
     early_stopping = tf.keras.callbacks.EarlyStopping(patience=5, restore_best_weights=True)
     reduce_plateau = tf.keras.callbacks.ReduceLROnPlateau(factor=0.5, patience=5)
-
     callbacks = [early_stopping, reduce_plateau, checkpoint]
 
     # Train model

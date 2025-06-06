@@ -80,10 +80,32 @@ You can find them under:
 
 - training/bb/ for bounding box detection
 
+### Bounding Boxes:
+
+
+
+
+
+### Semantic:
+
+
+
+| **Class Granularity**                 | **mPA [%]** | **mIoU [%]** |
+|--------------------------------------|-------------|--------------|
+| 25 classes (all individual labels)   | 67.9        | 48.07        |
+| 19 classes (partially merged)        | 69.36       | 57.13        |
+| 13 classes (strongly merged)         | 76.7        | 67.2         |
+
+
+
+![semantic_results.png](doc/semantic_results.png)
+Qualitative comparison of semantic segmentation results. Each column shows one example. The first row contains the original input images. The second row shows the ground truth annotations. 
+Rows three to five show the predictions from models trained with 13, 19, and all 25 classes, respectively. 
+
 
 ## 📩 Requesting Full Dataset
 
-This repository contains only sample data. For access to the complete dataset, please contact:
+This repository contains only sample data. For access to the complete dataset (size ~5.9 GB), please contact:
 
     stefan.sass@ovgu.de
 

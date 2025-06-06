@@ -26,15 +26,18 @@ dataset_base = str(find_root(__file__, "aura_dataset")) + "/dataset/bb/"
 
 # Define merge groups: new_id -> [old_ids...]
 merge_groups = {
-    13: [14],  # traffic lights
-    14: [15],  # adult
-    15: [16],  # child
-    16: [17],  # person w/ baby buggy
-    17: [18],  # person w/ mobility support
-    18: [19],  # dog
-    19: [20],  # railroad crossing signal
-    20: list(range(21, 57)),  # traffic signs
-    21: list(range(57, 64)),  # traffic markings
+    0: [1], # car
+    1: [2], # bus
+    2: [3], # tram
+    3: [4], # transporter
+    4: [5], # truck
+    5: [6,7,8,9], # bikes and biker
+    6: [10,11,12], # emergency vehicles
+    7: [13,14,20],  # traffic lights + railroad crossing signal
+    8: list(range(15, 19)),  # person
+    9: [19],  # dog
+    10: list(range(21, 57)),  # traffic signs
+    11: [0] + list(range(57, 64)),  # speed bump + traffic markings
 }
 
 # Flatten to a merge_map
@@ -66,8 +69,6 @@ class BoundingBoxDatasetLoader:
 
         # Set up class descriptions if provided, otherwise use an empty list
         self.class_descriptions = class_descriptions if class_descriptions else []
-
-
 
         if self.split == 'train':
             self.dataset_base = os.path.join(self.dataset_base, "train_validate")
@@ -103,7 +104,7 @@ class BoundingBoxDatasetLoader:
                 # Get first new id of merge_map
                 first_value = next(iter(merge_map.values()))
 
-                # Step 1: original mapping (0-12)
+                # Step 1: original mapping
                 self.class_mapping_merged = {
                     desc["pos"]: desc["name"]
                     for desc in self.class_descriptions
@@ -428,7 +429,6 @@ class BoundingBoxDatasetLoader:
 
         # 3. Count annotations after augmentation
         if self.split == 'test' or not self.augmentation:
-            augmented_annotations = total_annotations
             print(f"\nTotal annotations: {total_annotations} (no augmentation)")
         else:
             # Original annotations in training set (excluding validation)
@@ -453,45 +453,29 @@ class BoundingBoxDatasetLoader:
         # Sort by class ID
         sorted_classes = sorted(class_counter.items())
 
-        if self.merge_classes:
-            # Create a mapping for the merged classes distribution
-            merged_class_counter = collections.defaultdict(int)
-            for cls, count in class_counter.items():
-                merged_cls = merge_map.get(cls, cls)
-                merged_class_counter[merged_cls] += count
+        print("\nClass distribution:")
+        for cls_id, count in sorted_classes:
+            cls_name = self.class_mapping.get(cls_id, f"Unknown ({cls_id})")
+            print(f"  - {cls_name} (ID: {cls_id}): {count} annotations")
 
-            print("\nClass distribution (after merging):")
-            for cls_id, count in sorted(merged_class_counter.items()):
-                cls_name = self.class_mapping_merged.get(cls_id, f"Unknown ({cls_id})")
-                print(f"  - {cls_name} (ID: {cls_id}): {count} annotations")
-
-            print(
-                f"\nTotal unique classes in dataset: {len(unique_classes_original)} original, {len(merged_class_counter)} after merging")
-        else:
-            print("\nClass distribution:")
-            for cls_id, count in sorted_classes:
-                cls_name = self.class_mapping.get(cls_id, f"Unknown ({cls_id})")
-                print(f"  - {cls_name} (ID: {cls_id}): {count} annotations")
-
-            print(f"\nTotal unique classes in dataset: {len(unique_classes_original)}")
-
+        print(f"\nTotal unique classes in dataset: {len(unique_classes_original)}")
         print("=" * 50)
 
 
 # --- Example Usage ---
 if __name__ == "__main__":
     # Configuration options
-    BATCH_SIZE = 4
+    BATCH_SIZE = 1
     IMAGE_SIZE = (640, 640)  # Or your preferred size
-    SPLIT_RATIO = 0.2  # 80% training, 20% validation
+    SPLIT_RATIO = 0.1
 
     # Initialize the dataset loader with merged classes and expanded dataset
     train_loader = BoundingBoxDatasetLoader(
-        split="train",
+        split="test",
         batch_size=BATCH_SIZE,
         image_size=IMAGE_SIZE,
         split_ratio=SPLIT_RATIO,
-        merge_classes=False,  # Enable/disable class merging
+        merge_classes=True,  # Enable/disable class merging
         augmentation=True,  # Enable augmentation
         augmentation_copies=2  # Add 2 augmented copies for each original image (3x total data)
     )
@@ -510,14 +494,15 @@ if __name__ == "__main__":
     print(f"Validation dataset size: {len(val_ds) * train_loader.batch_size} samples")
     print(f"Num classes: {len(train_loader.class_mapping_merged)}")
 
+
     # Initialize the dataset loader with original unmerged classes
     test_loader = BoundingBoxDatasetLoader(
         split="test",
         batch_size=BATCH_SIZE,
         image_size=IMAGE_SIZE,
         split_ratio=SPLIT_RATIO,
-        merge_classes=False,  # Disable class merging
-        augmentation=False  # No augmentation for test data
+        merge_classes=True,  # Disable class merging
+        augmentation=True  # No augmentation for test data
     )
 
     # Print test dataset statistics
@@ -537,6 +522,3 @@ if __name__ == "__main__":
 
     print("Visualizing dataset with original (unmerged) classes:")
     test_loader.visualize_dataset(test_ds, rows=2, cols=2)
-
-    # Pause until a key is pressed
-    input("Press any key to continue...")
