@@ -1,0 +1,9 @@
+matplotlib
+numpy
+pillow
+scikit-learn
+argparse
+pycocotools
+tensorflow==2.15.0
+tensorflow-hub==0.16.1
+keras_cv
