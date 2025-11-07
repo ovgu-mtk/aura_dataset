@@ -148,4 +148,18 @@ Redistribution or commercial usage is not permitted without explicit permission.
 
 ## 🔗 Citation
 
-A citation entry will be added here once the corresponding paper or technical report is published.
+Please use the following citation when referencing https://rdcu.be/eOJtd:
+
+```
+@article{aura2025,
+  title = {AuRa dataset: A vision dataset from a bike’s perspective for autonomous robots in urban environments},
+  ISSN = {2366-598X},
+  url = {http://dx.doi.org/10.1007/s41315-025-00502-x},
+  DOI = {10.1007/s41315-025-00502-x},
+  journal = {International Journal of Intelligent Robotics and Applications},
+  publisher = {Springer Science and Business Media LLC},
+  author = {Sass,  Stefan and H\"{o}fer,  Markus and Weißflog,  Julia and Schmidt,  Stephan and Scholz,  Andreas},
+  year = {2025},
+  month = nov 
+}
+```
