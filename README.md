@@ -1,4 +1,4 @@
-# Aura Dataset - A BikePerception Dataset 
+# Aura Dataset - A Bike Perception Dataset 
 
 **A vision dataset for semantic segmentation and object detection recorded from a bike's perspective.**
 
