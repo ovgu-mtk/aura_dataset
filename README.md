@@ -10,6 +10,7 @@ and perception tasks from the viewpoint of a bicycle. It includes data for **sem
 > academic or research purposes, please contact:  
 > [stefan.sass@ovgu.de](mailto:stefan.sass@ovgu.de)  
 > [markus.hoefer@ovgu.de](mailto:markus.hoefer@ovgu.de)
+> [mtk@ovgu.de](mailto:mtk@ovgu.de)
 
 ---
 
