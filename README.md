@@ -10,6 +10,7 @@ and perception tasks from the viewpoint of a bicycle. It includes data for **sem
 > academic or research purposes, please contact:  
 > [stefan.sass@ovgu.de](mailto:stefan.sass@ovgu.de)  
 > [markus.hoefer@ovgu.de](mailto:markus.hoefer@ovgu.de)
+> [mtk@ovgu.de](mailto:mtk@ovgu.de)
 
 ---
 
@@ -133,9 +134,7 @@ Rows three to five show the predictions from models trained with 13, 19, and all
 
 This repository contains only sample data. For access to the complete dataset (size ~5.9 GB), please contact:
 
-    stefan.sass@ovgu.de
-
-    markus.hoefer@ovgu.de
+    mtk@ovgu.de
 
 Please include your institutional affiliation and intended use (academic or research only).
 
